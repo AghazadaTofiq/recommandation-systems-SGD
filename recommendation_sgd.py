@@ -4,18 +4,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 # 📌 Step 1: Load Dataset (E-Commerce User Ratings)
-url = "https://raw.githubusercontent.com/zygmuntz/goodbooks-10k/master/ratings.csv"  # Example dataset
+url = "https://raw.githubusercontent.com/zygmuntz/goodbooks-10k/master/ratings.csv"
 df = pd.read_csv(url)
 
 # 📌 Step 2: Preprocessing
-df = df[['user_id', 'book_id', 'rating']]  # Select relevant columns
-df.columns = ['user', 'item', 'rating']  # Rename for consistency
+df = df[['user_id', 'book_id', 'rating']]
+df.columns = ['user', 'item', 'rating']
 
-# Encode IDs for matrix factorization
 df['user'] = df['user'].astype("category").cat.codes
 df['item'] = df['item'].astype("category").cat.codes
 
-# Split into train & test
 train_data, test_data = train_test_split(df, test_size=0.2, random_state=42)
 
 # 📌 Step 3: Matrix Factorization with SGD
@@ -28,7 +26,6 @@ class SGDRS:
         self.reg = reg
         self.epochs = epochs
 
-        # Initialize user & item matrices
         self.U = np.random.normal(scale=0.1, size=(num_users, latent_factors))
         self.V = np.random.normal(scale=0.1, size=(num_items, latent_factors))
 
@@ -39,7 +36,6 @@ class SGDRS:
                 pred = np.dot(self.U[u], self.V[i].T)
                 error = r - pred
 
-                # Update rules
                 self.U[u] += self.lr * (error * self.V[i] - self.reg * self.U[u])
                 self.V[i] += self.lr * (error * self.U[u] - self.reg * self.V[i])
 
